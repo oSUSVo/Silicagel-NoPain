@@ -1,0 +1,67 @@
+// No Pain - Silica Gel inspired
+setcpm(90/4)
+
+const KEY = "Ab:major"
+
+let bassLpf = slider(911, 300, 5000)
+let guitarLpf = slider(1705.3, 300, 5000)
+let melodyLpf = slider(3134.1, 300, 5000)
+
+all(x => x._pianoroll({ cycles:4, autorange:1, width:800, height:200}))
+
+
+const bass = n("<[3 4] [2@3 4]>")
+  .scale(KEY)
+  .transpose(-24)
+  .s("supersaw")
+  .gain(1.0)
+  .room(0.6)
+  .pan(0.45)
+  .lpf(bassLpf)
+
+const drum = stack(
+  s("<[bd ~ [~ bd] ~]  [bd [~@3 bd] [~ bd] ~]!2 [[bd@3 bd] [~ bd] [~@3 bd] ~]>*1"),
+  s("<[~ sd ~ sd]!3 [~ sd [~ sd@3] [sd lt sd!2]]>*1")
+    .gain(0.8)
+    .pan(choose(0.4, 0.6)),
+  s("hh*8")
+    .gain(0.12)
+    .pan(0.6)
+).bank("RolandTR808")
+ .delay(0.1)
+ .room(0.9)
+ .rsize(2)
+
+const guitar = n("<[3 4] <[2 [5 4]] [2@3 4]>>")
+  .scale(KEY)
+  .s("gm_distortion_guitar:6")
+  .legato(0.95)
+  .room(0.5)
+  .gain(0.7)
+  .distort(1.0)
+  .attack(0.1)
+  .pan(0.6)
+  .lpf(guitarLpf)
+
+const pad = n("<[3 4], [7 8] [2@3 4], [0@3 8]>")
+  .scale(KEY)
+  .transpose(12)
+  .s("gm_pad_warm")
+  .room(0.4)
+  .gain(0.5)
+  .attack(0.1)
+  .pan(0.4)
+
+const melody = n(`
+<[1@3 0@3 2@2 1@2 2@2 2@1 1@1 0@2]
+<[2@3 1@2 0@1 -1@1 0@5 -1@1 0@1 1@2] [1]>>
+`)
+  .scale(KEY)
+  .transpose(12)
+  .s("gm_lead_2_sawtooth")
+  .gain(0.45)
+  .room(0.8)
+  .delay(0.25)
+  .lpf(2400)
+
+$: stack(bass, drum, guitar, pad, melody)
